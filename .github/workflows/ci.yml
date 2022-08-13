@@ -1,0 +1,32 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install python dependencies
+      run: |
+        pip install .
+        pip install pytest
+
+    - name: Run test suite
+      run: pytest tests
+
+    - name: Notify deepmodeling
+      uses: satak/webrequest-action@master
+      with:
+        url: https://deepmodeling.com/dflow/apis/op/notify/github?package_name=dflow_refiner&github_repo=${{ github.repository }}
+        method: GET
+      continue-on-error: true
