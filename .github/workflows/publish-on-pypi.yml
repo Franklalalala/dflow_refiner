@@ -1,11 +1,6 @@
 name: Publish on PyPI
 
-on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'VERSION'
+on: [push, pull_request]
 
 jobs:
   publish:
@@ -42,10 +37,3 @@ jobs:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
         verbose: true
-
-    - name: Notify deepmodeling
-      uses: satak/webrequest-action@master
-      with:
-        url: https://deepmodeling.com/dflow/apis/op/notify/pypi?package_name=dflow_refiner&github_repo=${{ github.repository }}
-        method: GET
-      continue-on-error: true
