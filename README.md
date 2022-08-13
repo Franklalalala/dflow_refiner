@@ -1,6 +1,6 @@
 # dflow_refiner
 
-Automated refinement procedure integrating multi-calculators for high-throughput molecular screening.
+Dflow OP for properly integrating multi-calculators.
 
 This OP is the default output of the
 [dflow OP cutter](https://github.com/deepmodeling/dflow-op-cutter),
@@ -25,5 +25,7 @@ intended to help developers get started with their dflow OPs.
 ## Installation
 
 ```shell
+pip install pydflow, ase, pandas
 pip install dflow_refiner
+docker pull franklalalala/py_autorefiner
 ```
