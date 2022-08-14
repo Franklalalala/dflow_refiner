@@ -26,6 +26,6 @@ intended to help developers get started with their dflow OPs.
 
 ```shell
 pip install pydflow, ase, pandas
-pip install dflow_refiner
+pip install dflow-refiner
 docker pull franklalalala/py_autorefiner
 ```
