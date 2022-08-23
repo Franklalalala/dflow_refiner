@@ -86,11 +86,11 @@ class gaussInGen(OP):
         return OPIOSign({
             'init': Artifact(Path),
             'info': Artifact(Path),
-            'in_para': dict,
             'cutoff': dict,
             'cmd_line': str,
             'charge': int,
-            'multi': int
+            'multi': int,
+            'cpu_per_worker': int
         })
 
     @classmethod
@@ -107,16 +107,6 @@ class gaussInGen(OP):
         from ase.io import read
         from ase.io.gaussian import write_gaussian_in
 
-        # 'cpu_per_task': int,
-        # 'mem_per_task': str,
-        # 'cmd_line': str,
-        # 'cutoff_mode': str,
-        # 'cutoff_rank': Optional[int],
-        # 'cutoff_value': Optional[float],
-        # 'charge': Optional[int],
-        # 'multi': Optional[int]
-
-        in_para = op_in['in_para']
         cwd_ = os.getcwd()
         os.makedirs('raw', exist_ok=True)
         info = pd.read_pickle(op_in['info'])
@@ -132,8 +122,8 @@ class gaussInGen(OP):
                                   properties=[' '],
                                   method='',
                                   basis=op_in['cmd_line'],
-                                  nprocshared=str(in_para['cpu_per_worker']),
-                                  mem=in_para['mem_per_worker'],
+                                  nprocshared=str(op_in['cpu_per_worker']),
+                                  mem='10GB', # 10GB by default
                                   mult=op_in['multi'],
                                   charge=op_in['charge'],
                                   chk=dst_chk

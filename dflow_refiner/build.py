@@ -150,17 +150,17 @@ class BuildWithAux(OP):
         input_root = os.path.abspath(op_in['in_workbase'])
         aux_root = os.path.abspath(op_in['in_aux'])
         aux_para = op_in['aux_para']
-        if aux_para['is_aux_mixed']:
+        if 'is_aux_mixed' in aux_para.keys() and aux_para['is_aux_mixed'] == True:
             public_folder = os.path.join(aux_root, aux_para['pbc_aux_name'])
             _public_unit()
             for a_private in aux_para['pvt_aux_list']:
                 private_folder = os.path.join(aux_root, a_private)
                 _private_unit()
-        elif aux_para['pvt_aux_list'] != None:
+        elif 'pvt_aux_list' in aux_para.keys() and aux_para['pvt_aux_list'] != None:
             for a_private in aux_para['pvt_aux_list']:
                 private_folder = os.path.join(aux_root, a_private)
                 _private_unit()
-        elif aux_para['is_aux_pubic']:
+        elif 'is_aux_public' in aux_para.keys() and aux_para['is_aux_public'] == True:
             public_folder = aux_root
             _public_unit()
         else:
@@ -201,32 +201,4 @@ class Empty(OP):
         return op_out
 
 
-class simpleParaSlice(OP):
-    def __init__(self):
-        pass
-
-    @classmethod
-    def get_input_sign(cls):
-        return OPIOSign({
-            'prefix': str,
-            'cmd_line_list': list,
-            'prefix_list': list
-        })
-
-    @classmethod
-    def get_output_sign(cls):
-        return OPIOSign({
-            'cmd_line': str,
-        })
-
-    @OP.exec_sign_check
-    def execute(
-            self,
-            op_in: OPIO,
-    ) -> OPIO:
-        slice_idx = op_in['prefix_list'].index(op_in['prefix'])
-        op_out = OPIO({
-            'cmd_line': op_in['cmd_line_list'][slice_idx]
-        })
-        return op_out
 

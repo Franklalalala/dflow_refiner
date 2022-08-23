@@ -138,7 +138,8 @@ class batchExe(OP):
                 time.sleep(batch_para['poll_interval'])
 
         for a_proc in res_list:
-            a_proc.wait()
+            if a_proc != None:
+                a_proc.wait()
         outs = []
         cwd_2 = os.getcwd()
         for a_job in job_list:
@@ -154,7 +155,6 @@ class batchExe(OP):
             "out_cooking": outs,
         })
         return op_out
-
 
 class asePreSan(OP):
     def __init__(self):
@@ -178,8 +178,9 @@ class asePreSan(OP):
             self,
             op_in: OPIO,
     ) -> OPIO:
+        # Change your calculator here!!
         from ase.calculators.emt import EMT
-        from ase.io import read, write
+        from ase.io import read
         import pandas as pd
 
         cwd_ = os.getcwd()

@@ -1,13 +1,12 @@
-from typing import List, Union, Dict
+from typing import Dict
 
+from dflow import Step, Steps, Inputs, InputArtifact, InputParameter, OutputArtifact, Outputs
+from dflow.plugins.dispatcher import DispatcherExecutor
+from dflow.python import PythonOPTemplate
 from dflow_refiner.build import *
-
 from dflow_refiner.calculators import *
 from dflow_refiner.inputGen import *
 from dflow_refiner.parser import *
-from dflow import Step, Steps, Inputs, InputArtifact, InputParameter, OutputArtifact, Outputs
-from dflow.plugins.dispatcher import DispatcherExecutor
-from dflow.python import PythonOPTemplate, BigParameter
 
 
 class Fixed_in_ref():
@@ -20,8 +19,8 @@ class Fixed_in_ref():
                  is_batch_exe: bool = False,
                  num_worker: int = None,
                  cpu_per_worker: int = None,
-                 base_node: int = None,
-                 poll_interval: float = None,
+                 base_node: int = 0,
+                 poll_interval: float = 0.5,
 
                  cutoff_mode: str = 'None',
                  cutoff_rank: int = None,
@@ -32,8 +31,7 @@ class Fixed_in_ref():
                  pvt_aux_list: List[str] = None,
                  pbc_aux_name: str = None,
 
-                 parse_para: dict = None,
-                 slice_para: dict = None):
+                 ctm_para: dict = dict()):
         """
         Fixed refiner input parameters
 
@@ -63,13 +61,12 @@ class Fixed_in_ref():
             pvt_aux_list: if there are multiple private folders, put folder names here.
             is_aux_public: if not mixed, flag to indicate the only auxilary folder
 
-            parse_para: customized parse parameter.
-
-            slice_para: for slice feature
+            ctm_para: Customized parameters
         """
         self.exe_core = {'cmd_list': cmd_list, 'out_list': out_list, 'in_fmt': in_fmt, 'log_file': log_file}
         if is_batch_exe:
-            assert isinstance(num_worker*cpu_per_worker*base_node, int), f'Please input batch execution related parameters.'
+            assert isinstance(num_worker * cpu_per_worker * base_node,
+                              int), f'Please input batch execution related parameters.'
             self.exe_batch = {'base_node': base_node, 'cpu_per_worker': cpu_per_worker,
                               'num_worker': num_worker, 'poll_interval': poll_interval}
 
@@ -86,9 +83,7 @@ class Fixed_in_ref():
         self.aux = {'is_aux_mixed': is_aux_mixed, 'is_aux_public': is_aux_public,
                     'pvt_aux_list': pvt_aux_list, 'pbc_aux_name': pbc_aux_name}
 
-        # Customized parameters
-        self.parse_para = parse_para
-        self.slice_para = slice_para
+        self.ctm = ctm_para
 
 
 class Refiner(Steps):
@@ -117,7 +112,8 @@ class xTB_Refiner(Refiner):
                  name: str = None, inputs: Inputs = None, outputs: Outputs = None,
                  steps: List[Union[Step, List[Step]]] = None, memoize_key: str = None,
                  annotations: Dict[str, str] = None):
-        super(xTB_Refiner, self).__init__(in_para=in_para, image=image, executor=executor, name=name, inputs=inputs, outputs=outputs,
+        super(xTB_Refiner, self).__init__(in_para=in_para, image=image, executor=executor, name=name, inputs=inputs,
+                                          outputs=outputs,
                                           memoize_key=memoize_key, annotations=annotations, steps=steps)
 
         self.prefix = self.name
@@ -151,7 +147,9 @@ class xTB_Refiner(Refiner):
 
         step_parse = Step(
             name='parse',
-            template=PythonOPTemplate(xtbParser, image=image),
+            template=PythonOPTemplate(xtbParser, image=image,
+                                      output_artifact_global_name={'info': 'global_xtb_info',
+                                                                   'out_cooked': 'global_xtb_out_cooked'}),
             artifacts={'in_cooked': step_exe.outputs.artifacts['out_cooking']},
             key=f'{self.prefix}-parse',
         )
@@ -167,7 +165,8 @@ class ABC_Refiner(Refiner):
                  name: str = None, inputs: Inputs = None, outputs: Outputs = None,
                  steps: List[Union[Step, List[Step]]] = None, memoize_key: str = None,
                  annotations: Dict[str, str] = None):
-        super(xTB_Refiner, self).__init__(in_para=in_para, image=image, executor=executor, name=name, inputs=inputs, outputs=outputs,
+        super(ABC_Refiner, self).__init__(in_para=in_para, image=image, executor=executor, name=name, inputs=inputs,
+                                          outputs=outputs,
                                           memoize_key=memoize_key, annotations=annotations, steps=steps)
 
         self.inputs.artifacts['public_inp'] = InputArtifact()
@@ -203,12 +202,103 @@ class ABC_Refiner(Refiner):
 
         step_parse = Step(
             name='parse',
-            template=PythonOPTemplate(abcParser, image=image),
+            template=PythonOPTemplate(abcParser, image=image,
+                                      output_artifact_global_name={'info': 'global_abc_info',
+                                                                   'out_cooked': 'global_abc_out_cooked'}),
             artifacts={'in_cooked': step_exe.outputs.artifacts['out_cooking']},
-            parameters={'LM_folder': in_para.parse_para['LM_folder'], 'prefix': self.prefix},
+            parameters={'LM_folder': in_para.ctm['LM_folder_name'], 'prefix': self.prefix},
             key=f'{self.prefix}-parse',
         )
         self.add(step_parse)
 
+        self.outputs.artifacts['info']._from = step_parse.outputs.artifacts['info']
+        self.outputs.artifacts['out_cooked']._from = step_parse.outputs.artifacts['out_cooked']
+
+
+class Gau_Refiner(Refiner):
+    def __init__(self, in_para: Fixed_in_ref,
+                 image: str, executor: DispatcherExecutor,
+                 name: str = None, inputs: Inputs = None, outputs: Outputs = None,
+                 steps: List[Union[Step, List[Step]]] = None, memoize_key: str = None,
+                 annotations: Dict[str, str] = None):
+        super(Gau_Refiner, self).__init__(in_para=in_para, image=image, executor=executor, name=name, inputs=inputs,
+                                          outputs=outputs,
+                                          memoize_key=memoize_key, annotations=annotations, steps=steps)
+
+        # Parameters could be sliced.
+        self.inputs.parameters['cmd_line'] = InputParameter()
+        self.inputs.parameters['charge'] = InputParameter()
+        self.inputs.parameters['multi'] = InputParameter()
+        self.inputs.parameters['prefix'] = InputParameter()
+        self.prefix = self.inputs.parameters['prefix']
+
+        step_inputGen = Step(
+            name="inputGen",
+            template=PythonOPTemplate(gaussInGen, image=image),
+            artifacts={'init': self.inputs.artifacts['init'], 'info': self.inputs.artifacts['info']},
+            parameters={'cutoff': in_para.cutoff,
+                        'cmd_line': self.inputs.parameters['cmd_line'],
+                        'charge': self.inputs.parameters['charge'],
+                        'multi': self.inputs.parameters['multi'],
+                        'cpu_per_worker': in_para.exe_batch['cpu_per_worker']
+                        },
+            key=f"{self.prefix}-inputGen",
+        )
+        self.add(step_inputGen)
+
+        if 'has_chk_input' in in_para.ctm.keys() and in_para.ctm['has_chk_input'] == True:
+            self.inputs.artifacts['in_chk'] = InputArtifact()
+            step_build = Step(
+                name="build",
+                template=PythonOPTemplate(BuildWithAux, image=image),
+                artifacts={"in_workbase": step_inputGen.outputs.artifacts['out_raw'],
+                           'in_aux': self.inputs.artifacts['in_chk']},
+                parameters={'aux_para': in_para.aux},
+                key=f"{self.prefix}-build",
+            )
+        else:
+            step_build = Step(
+                name="build",
+                template=PythonOPTemplate(simpleBuild, image=image),
+                artifacts={"in_workbase": step_inputGen.outputs.artifacts['out_raw']},
+                key=f"{self.prefix}-build",
+            )
+        self.add(step_build)
+
+        step_exe = Step(
+            name='exe',
+            template=PythonOPTemplate(batchExe, image=image),
+            artifacts={'in_cooking': step_build.outputs.artifacts['out_workbase']},
+            parameters={'core_para': in_para.exe_core, 'batch_para': in_para.exe_batch},
+            executor=executor,
+            key=f'{self.prefix}-exe',
+        )
+        self.add(step_exe)
+
+        if 'keep_chk' in in_para.ctm.keys() and in_para.ctm['keep_chk'] == True:
+            self.outputs.artifacts['cooked_chk'] = OutputArtifact()
+            step_parse = Step(
+                name='parse',
+                template=PythonOPTemplate(gaussParser, image=image,
+                                          output_artifact_global_name={'info': 'global_gau_info',
+                                                                       'out_cooked': 'global_gau_out_cooked',
+                                                                       'cooked_chk': 'global_gau_cooked_chk'}),
+                artifacts={'in_cooked': step_exe.outputs.artifacts['out_cooking']},
+                parameters={'prefix': self.prefix, 'keep_chk': True},
+                key=f'{self.prefix}-parse',
+            )
+            self.add(step_parse)
+            self.outputs.artifacts['cooked_chk']._from = step_parse.outputs.artifacts['cooked_chk']
+        else:
+            step_parse = Step(
+                name='parse',
+                template=PythonOPTemplate(gaussParser, image=image,
+                                          output_artifact_global_name={'info': 'global_gau_info',
+                                                                       'out_cooked': 'global_gau_out_cooked'}),
+                artifacts={'in_cooked': step_exe.outputs.artifacts['out_cooking']},
+                parameters={'prefix': self.prefix, 'keep_chk': False},
+                key=f'{self.prefix}-parse',
+            )
+            self.add(step_parse)
         self.outputs.artifacts['info']._from = step_parse.outputs.artifacts['info']
         self.outputs.artifacts['out_cooked']._from = step_parse.outputs.artifacts['out_cooked']

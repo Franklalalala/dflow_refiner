@@ -80,7 +80,6 @@ class gaussParser(OP):
     def get_input_sign(cls):
         return OPIOSign({
             'in_cooked': Artifact(Path),
-            'in_para': dict,
             'prefix': str,
             'keep_chk': bool
         })
@@ -98,12 +97,11 @@ class gaussParser(OP):
             self,
             op_in: OPIO,
     ) -> OPIO:
-        from autorefiner.ase_gaussian_io import read_gaussian_out
+        from dflow_refiner.ase_gaussian_io import read_gaussian_out
         from ase.units import Hartree, eV
         from ase.io import write
 
         cwd_ = os.getcwd()
-        in_para = op_in['in_para']
         prefix = op_in['prefix']
         if op_in['keep_chk']:
             chk_folder_name = 'cooked_chk'
