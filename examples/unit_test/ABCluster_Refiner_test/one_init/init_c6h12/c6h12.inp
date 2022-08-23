@@ -1,0 +1,24 @@
+lm_dir          job1    # Save the local minima to this folder.
+num_calcs       100      # Total number of calculations.
+do_coarse_opt   yes      # no: Do NOT the coarse optimization.
+min_energy_gap  5.E-4    # When two energies differ smaller than 
+                         # this value, they are treated as identical.
+                         # A negative number means do not remove
+                         # energetically degenerated ones.
+max_geom_iters  3000     # The maximum number of iterations for local optimization.
+                         # If it is less or equal than zero, then the number is unlimited.
+
+components
+  c6h12.xyz 1
+  fix 0 0 0 0 0 0 
+  1  2  3  4  5  6
+  ****
+end
+
+xtb
+  0 0 2
+end
+
+commands
+  $xtb$
+end
