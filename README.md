@@ -12,7 +12,7 @@ This OP is the default output of the
 * [`dflow_refiner/`](dflow_refiner/): The main source code of the OP package
 * [`examples/`](examples/): An example of how to submit a workflow using this OP
   * [`unit_test/`](examples/unit_test): Detailed test of functions and OPs.
-  * [`miniAutoSteper/`](examples/miniAutoSteper): Simplified version of [`AutoSteper`]([Franklalalala/AutoSteper: Automated Stepwise Addition Procedure for Extrafullerene. (github.com)](https://github.com/Franklalalala/AutoSteper))
+  * [`miniAutoSteper/`](examples/miniAutoSteper): Simplified version of [`AutoSteper`](https://github.com/Franklalalala/AutoSteper)
   * [`conformation_search_test/`](examples/conformation_search_test): Automated conformation search with `dflow_refiner`
 * [`VERSION`](VERSION): Current version
 * [`.gitignore`](.gitignore): Telling git which files to ignore
