@@ -3,8 +3,7 @@
 Dflow OP for properly integrating multi-calculators.
 
 This OP is the default output of the
-[dflow OP cutter](https://github.com/deepmodeling/dflow-op-cutter),
-intended to help developers get started with their dflow OPs.
+[dflow OP cutter](https://github.com/deepmodeling/dflow-op-cutter).
 
 ## Repository contents
 
