@@ -9,14 +9,13 @@ intended to help developers get started with their dflow OPs.
 ## Repository contents
 
 * [`.github/`](.github/): [Github Actions](https://github.com/features/actions) configuration
-  * [`ci.yml`](.github/workflows/ci.yml): runs tests at every new commit
-  * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI - just generate a [PyPI API token](https://pypi.org/help/#apitoken) for your PyPI account and add it to the `PYPI_API_TOKEN` secret of your github repository
-  * [`publish-on-dockerhub.yml`](.github/workflows/publish-on-dockerhub.yml): automatically build docker image and push to Docker Hub - just add the `DOCKER_USERNAME` and `DOCKER_PASSWORD` secrets of your github repository
-* [`refiner/`](refiner/): The main source code of the OP package
+  * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI when version changed
+* [`dflow_refiner/`](dflow_refiner/): The main source code of the OP package
 * [`examples/`](examples/): An example of how to submit a workflow using this OP
-* [`tests/`](tests/): Basic regression tests using the [pytest](https://docs.pytest.org/en/latest/) framework.
+  * [`unit_test/`](examples/unit_test): Detailed test of functions and OPs.
+  * [`miniAutoSteper/`](examples/miniAutoSteper): Simplified version of [`AutoSteper`]([Franklalalala/AutoSteper: Automated Stepwise Addition Procedure for Extrafullerene. (github.com)](https://github.com/Franklalalala/AutoSteper))
+  * [`conformation_search_test/`](examples/conformation_search_test): Automated conformation search with `dflow_refiner`
 * [`VERSION`](VERSION): Current version
-* [`Dockerfile`](Dockerfile): Dockerfile for building docker image
 * [`.gitignore`](.gitignore): Telling git which files to ignore
 * [`LICENSE`](LICENSE): License for your OP
 * [`README.md`](README.md): This file
@@ -29,3 +28,7 @@ pip install pydflow, ase, pandas
 pip install dflow-refiner
 docker pull franklalalala/py_autorefiner
 ```
+
+## Contact me
+
+E-mail: 1660810667@qq.com
