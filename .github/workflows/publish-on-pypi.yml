@@ -1,6 +1,11 @@
 name: Publish on PyPI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'VERSION'
 
 jobs:
   publish:
