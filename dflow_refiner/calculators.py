@@ -87,10 +87,11 @@ class batchExe(OP):
         def _stack_a_job():
             os.chdir(job_list[tracker])
             if core_para['in_fmt']:
-                for an_input in os.listdir('./'):
-                    if an_input.endswith(core_para['in_fmt']):
-                        cmd_list.append(an_input)
-                        break
+                if core_para['in_fmt'] != 'None':
+                    for an_input in os.listdir('./'):
+                        if an_input.endswith(core_para['in_fmt']):
+                            cmd_list.append(an_input)
+                            break
             else:
                 cmd_list.append(os.listdir('./')[0])
             if core_para['log_file']:
@@ -102,8 +103,8 @@ class batchExe(OP):
             end_node = batch_para['base_node'] + batch_para['cpu_per_worker'] * (worker_id + 1) - 1
 
             res_list[worker_id] = subprocess.Popen(f'taskset -c {start_node}-{end_node} {cmd_line}', shell=True)
-
-            del cmd_list[-1]
+            if core_para['in_fmt'] != 'None':
+                del cmd_list[-1]
             if core_para['log_file']:
                 del cmd_list[-1]
             os.chdir('./..')

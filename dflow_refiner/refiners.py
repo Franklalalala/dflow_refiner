@@ -30,6 +30,7 @@ class Fixed_in_ref():
                  is_aux_public: bool = True,
                  pvt_aux_list: List[str] = None,
                  pbc_aux_name: str = None,
+                 rename2: str = None,
 
                  ctm_para: dict = dict()):
         """
@@ -60,6 +61,7 @@ class Fixed_in_ref():
             pbc_aux_name: see above
             pvt_aux_list: if there are multiple private folders, put folder names here.
             is_aux_public: if not mixed, flag to indicate the only auxilary folder
+            rename2: the inputfile will be renamed to rename2 during setting up workbase
 
             ctm_para: Customized parameters
         """
@@ -81,7 +83,8 @@ class Fixed_in_ref():
             assert pbc_aux_name != None, f'Please input a public floder name.'
             assert len(pvt_aux_list) != 0, f'More than one private folders required.'
         self.aux = {'is_aux_mixed': is_aux_mixed, 'is_aux_public': is_aux_public,
-                    'pvt_aux_list': pvt_aux_list, 'pbc_aux_name': pbc_aux_name}
+                    'pvt_aux_list': pvt_aux_list, 'pbc_aux_name': pbc_aux_name,
+                    'rename2': rename2}
 
         self.ctm = ctm_para
 

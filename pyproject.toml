@@ -1,7 +1,7 @@
 [project]
 name = "dflow_refiner"
 dynamic = ["version"]
-description = "Automated refinement procedure integrating multi-calculators for high-throughput molecular screening."
+description = "Dflow OP library to integrate multi-calculators for high-throughput molecule screening."
 authors = [{name = "franklalalala", email = "1660810667@qq.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}

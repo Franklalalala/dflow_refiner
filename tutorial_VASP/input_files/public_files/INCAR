@@ -1,0 +1,34 @@
+#initial 
+SYSTEM=Cu_optimization
+ISTART = 0
+ICHARG = 2
+ENCUT = 500
+PREC = Normal #一般normal就够用了，如果要精度更高一点就用Accurate(进行声子谱或者二阶导数计算的时候用)
+EDIFF = 1E-4
+
+#electronic calculation
+ISMEAR = 1       #根据材料的不同设置，导体，半导体等等
+SIGMA = 0.2 
+NELM = 60   
+NELMIN = 4
+
+#structure optimization
+NSW = 700 #算单点的时候为0；算初始结构很差的体系设大一点（500以上）
+IBRION = 2  #一般用=2，做频率计算的时候=5（POTIM=0.015,NFREE=2）
+POTIM = 0.1
+EDIFFG = -0.01
+ISIF = 2     #优化原子坐标
+
+#magnetization
+ISPIN = 1 
+#MAGMOM 
+
+#偶极校正
+#LDIPOL = .TRUE.
+#IDIPOL = 3 
+
+ISYM = 0
+#ALGO = Normal
+LREAL = Auto
+#IVDW = 10 #范德华力校正，1|10是DFT-D2
+

@@ -128,19 +128,28 @@ class BuildWithAux(OP):
             for an_input in os.listdir(input_root):
                 os.chdir(dst)
                 a_file_name = os.path.splitext(an_input)[0]
-                os.makedirs(a_file_name, exist_ok=True)
                 os.chdir(a_file_name)
                 shutil.copy(src=os.path.join(private_folder, a_file_name + an_aux_fmt), dst=a_file_name + an_aux_fmt)
-                shutil.copy(src=os.path.join(input_root, an_input), dst=an_input)
+
         def _public_unit():
+            for an_input in os.listdir(input_root):
+                os.chdir(dst)
+                a_file_name = os.path.splitext(an_input)[0]
+                os.chdir(a_file_name)
+                for a_public_file in os.listdir(public_folder):
+                    shutil.copy(src=os.path.join(public_folder, a_public_file), dst=a_public_file)
+
+        def _build_init():
             for an_input in os.listdir(input_root):
                 os.chdir(dst)
                 a_file_name = os.path.splitext(an_input)[0]
                 os.makedirs(a_file_name, exist_ok=True)
                 os.chdir(a_file_name)
-                shutil.copy(src=os.path.join(input_root, an_input), dst=an_input)
-                for a_public_file in os.listdir(public_folder):
-                    shutil.copy(src=os.path.join(public_folder, a_public_file), dst=a_public_file)
+                if 'rename2' in aux_para.keys() and aux_para['rename2'] != None:
+                    shutil.copy(src=os.path.join(input_root, an_input), dst=aux_para['rename2'])
+                else:
+                    shutil.copy(src=os.path.join(input_root, an_input), dst=an_input)
+
 
         name = 'cooking'
         cwd_ = os.getcwd()
@@ -150,6 +159,7 @@ class BuildWithAux(OP):
         input_root = os.path.abspath(op_in['in_workbase'])
         aux_root = os.path.abspath(op_in['in_aux'])
         aux_para = op_in['aux_para']
+        _build_init()
         if 'is_aux_mixed' in aux_para.keys() and aux_para['is_aux_mixed'] == True:
             public_folder = os.path.join(aux_root, aux_para['pbc_aux_name'])
             _public_unit()

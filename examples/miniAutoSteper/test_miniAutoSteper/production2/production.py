@@ -18,6 +18,8 @@ from dflow_refiner.miniAutoSteper_op import *
 from dflow_refiner.refiners import Refiner
 from dflow_refiner.tools import unfix_steps_in_para
 
+
+time.sleep(60*60*2)
 # (sometimes) ASE package is needed
 upload_packages.append(r'C:\Users\86185\anaconda3\envs\dflow\Lib\site-packages\ase')
 
@@ -128,8 +130,8 @@ gau_sp_template = Gau_Refiner(in_para=gau_sp_in,
 
 if __name__ == "__main__":
     wf = Workflow(name="production")
-    final_addon_num = 4
-    pristine_cage = upload_artifact(Path('./C66_dihept.xyz'))
+    final_addon_num = 6
+    pristine_cage = upload_artifact(Path('./C60_000001812opted.xyz'))
 
     init_one_step = Step(name="init-step", template=init_grow_unit,
                          artifacts={'init': pristine_cage},
