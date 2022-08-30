@@ -21,6 +21,7 @@ dependencies = [
 
 [tool.setuptools.dynamic]
 version = {file = ["VERSION"]}
+py-modules = ["dflow_refiner"]
 
 [project.urls]
 Source = "https://github.com/franklalalala/dflow_refiner"
