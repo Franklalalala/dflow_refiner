@@ -19,9 +19,11 @@ dependencies = [
     "pydflow>=1.0",
 ]
 
+[tool.setuptools]
+py-modules = ["dflow_refiner"]
+
 [tool.setuptools.dynamic]
 version = {file = ["VERSION"]}
-py-modules = ["dflow_refiner"]
 
 [project.urls]
 Source = "https://github.com/franklalalala/dflow_refiner"
